@@ -99,3 +99,5 @@ Certain characters (space, quotes, `%`, `&`, `?`, `#`, etc.) can break or get au
 > The obfuscated string is **deterministic**: same input always produces the same output.
 
 ---
+Link 
+https://cyberleelawat.github.io/ZeroTrust
