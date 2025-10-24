@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZeroTrust</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/favicon.jpg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0b1020">
+  <!-- zxcvbn for password strength/crack time -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"></script>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-900 text-slate-100">
+  <canvas id="matrixCanvas"></canvas>
+  
+  <!-- Toggle Matrix Button -->
+  <button id="matrixToggleBtn" class="fixed top-2 right-2 z-20 btn-neon rounded-full hover-scale tilt-3d interactive-radius w-10 h-10 grid place-items-center text-white text-base font-semibold" aria-pressed="false" aria-label="Toggle matrix background" title="Toggle Matrix">雨</button>
+
+  <div id="app" class="w-full max-w-3xl mx-auto">
+    <div class="fade-in text-center">
+      <div class="w-32 h-32 rounded-full border-4 border-indigo-500 mb-4 mx-auto avatar-glow avatar-frame">
+        <img src="assets/profile.jpg" alt="Cyber Leelawat" width="128" height="128" loading="eager" decoding="async" class="avatar-crop" />
+      </div>
+      <h1 class="title font-bold mb-2 text-indigo-400">ZeroTrust</h1>
+      <p class="text-lg font-semibold text-indigo-300 mb-4">Developed by Cyber Leelawat</p>
+<p class="text-sm text-indigo-200/80 mb-4">Owner: Virendra Kumar (Mr. Leelawat)</p> <div class="flex justify-center space-x-4 mb-6"> <a href="https://www.linkedin.com/in/virendra-kumar-cyber-leelawat/" target="_blank" rel="noopener noreferrer" class="link-neon hover-scale transition tilt-3d interactive-radius" aria-label="LinkedIn"> <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/linkedin.svg" alt="LinkedIn" class="social-icon" /> </a> <a href="https://x.com/cyberleelawat" target="_blank" rel="noopener noreferrer" class="link-neon hover-scale transition tilt-3d interactive-radius" aria-label="X/Twitter"> <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/x.svg" alt="Twitter" class="social-icon" /> </a> <a href="https://github.com/cyberleelawat" target="_blank" rel="noopener noreferrer" class="link-neon hover-scale transition tilt-3d interactive-radius" aria-label="GitHub"> <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg" alt="GitHub" class="social-icon" /> </a> </div> </div>
+
+    <div class="w-full max-w-md glass-card p-6 tilt-3d interactive-radius mx-auto">
+      <button id="encryptBtn" class="w-full btn-neon text-white font-semibold py-3 px-4 rounded-lg hover-scale tilt-3d interactive-radius">Encrypt</button>
+      
+      <div id="encryptionTab" class="mt-6 p-4 surface-muted rounded-lg hidden slide-in">
+        <h2 class="text-xl font-semibold text-emerald-400 mb-4">Generate Secure Password</h2>
+        <p class="text-emerald-300 font-medium text-sm mb-4 p-3 surface-muted rounded-lg shadow-sm scale-in">🔑 Enter a unique password (8–20 chars) to encrypt and see strength. (e.g., Jodhpur@2025, cyber_leelawat).</p>
+
+        <div class="mb-4">
+          <div class="flex items-center gap-2">
+            <input
+              id="inputText"
+              type="password"
+              placeholder="Enter your password"
+              maxlength="20"
+              class="flex-1 min-w-0 p-2 border border-indigo-500/40 bg-transparent placeholder:text-slate-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 text-sm text-slate-100 input-neon"
+            />
+            <button id="toggleVisibility" type="button" class="px-3 py-2 text-xs rounded-lg surface-muted hover-scale shrink-0">Show</button>
+          </div>
+          <div class="w-full flex items-center justify-between mt-2">
+            <label class="switch text-sm text-emerald-300 font-semibold">
+              <input id="urlSafeToggle" type="checkbox" aria-label="Toggle URL safe mode">
+              <span class="switch-track"></span>
+              <span class="ml-2">URL-safe mode</span>
+            </label>
+            <span id="lengthCounter" class="text-sm text-indigo-200 whitespace-nowrap">0/20</span>
+          </div>
+        </div>
+
+        <button id="generateBtn" class="w-full btn-neon text-white font-semibold py-2 px-4 rounded-lg hover-scale tilt-3d interactive-radius">Create</button>
+
+        <div id="outputSection" class="mt-4 p-4 surface-muted rounded-lg hidden">
+          <p class="text-indigo-300 font-medium text-sm"><strong>Encrypted Password:</strong> <span id="outputText">[Encrypted output here]</span></p>
+          <p id="crackTime" class="text-yellow-300 font-medium text-sm mt-2">Estimated Crack Time: N/A</p>
+          <button id="copyBtn" class="mt-2 btn-neon text-white font-semibold py-1 px-3 rounded-lg hover-scale tilt-3d interactive-radius">Copy</button>
+        </div>
+
+        <div class="mt-6">
+          <h3 class="text-lg font-semibold text-pink-400 mb-2">Check Email Breach</h3>
+          <div class="flex items-center gap-2">
+            <input id="emailCheckInput" type="email" placeholder="Enter your email" class="flex-1 p-2 border rounded-lg bg-transparent text-slate-100 placeholder:text-slate-400"/>
+            <button id="checkEmailBtn" class="btn-neon text-white py-2 px-4 rounded-lg hover-scale tilt-3d">Check</button>
+          </div>
+          <p id="breachResult" class="text-sm mt-2 text-red-400"></p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="mt-10 text-center interactive-radius tilt-3d">
+      <p class="text-sm text-indigo-300/80 mb-2">© 2025 ZeroTrust by Cyber Leelawat. All rights reserved.</p>
+      <p class="text-red-400 font-semibold text-sm">⚠️ Your data is not stored. Privacy respected.</p>
+      <p class="text-xs text-indigo-300/70 mt-2">Note: This tool performs deterministic obfuscation, not cryptographic encryption.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Simple hash for encryption layers
+    function simpleHash(str){let h=0;for(let i=0;i<str.length;i++){h=(h*31+str.charCodeAt(i))%1000000;}return h;}
+
+    // Show encryption tab
+    document.getElementById('encryptBtn').addEventListener('click',()=>{
+      const tab=document.getElementById('encryptionTab');
+      tab.classList.remove('hidden');
+      tab.classList.add('slide-in');
+
+      const input=document.getElementById('inputText');
+      const counter=document.getElementById('lengthCounter');
+      const toggle=document.getElementById('toggleVisibility');
+
+      counter.textContent=`${input.value.length}/20`;
+      input.addEventListener('input',()=>{if(input.value.length>20)input.value=input.value.slice(0,20);counter.textContent=`${input.value.length}/20`;});
+      toggle.onclick=()=>{input.type=input.type==='password'?'text':'password';toggle.textContent=input.type==='password'?'Show':'Hide';};
+    });
+
+    // Generate encrypted password + crack time
+    document.getElementById('generateBtn').addEventListener('click',()=>{
+      const input=document.getElementById('inputText').value;
+      if(input.length<8||input.length>20){alert('Password must be 8–20 chars');return;}
+
+      const chars={engLower:'abcdefghijklmnopqrstuvwxyz',engUpper:'ABCDEFGHIJKLMNOPQRSTUVWXYZ',numbers:'0123456789',symbols:"!@#$%^&*()-_+=<>?",urlSafeSymbols:"-_.~@",codes:'PythonJavaJS',words:['alpha','beta','gamma','delta','omega','cipher','matrix','quantum','neon','hacker','crypto','root','zero','trust']};
+      let result=input;const hash=simpleHash(input);
+      result=result.split('').map(c=>String.fromCharCode(c.charCodeAt(0)+3)).join('');
+      result=result.split('').map((c,i)=>(hash+i)%3===0?chars.engUpper[(c.charCodeAt(0)+hash)%chars.engUpper.length]:c).join('');
+      result+=chars.codes[hash%chars.codes.length]+chars.codes[(hash+7)%chars.codes.length];
+      result+='-'+chars.words[hash%chars.words.length]+'-';
+      result=result.slice(0,5)+chars.numbers[hash%chars.numbers.length]+result.slice(5);
+      const useUrlSafe=document.getElementById('urlSafeToggle').checked;
+      const symSet=useUrlSafe?chars.urlSafeSymbols:chars.symbols;
+      result=result.slice(0,8)+symSet[hash%symSet.length]+result.slice(8);
+      result=result.split('').reverse().join('');
+      result=result.substring(0,20);
+      if(useUrlSafe){result=result.replace(/[^A-Za-z0-9\-_.~@]/g,'-');}
+
+      document.getElementById('outputText').textContent=result;
+      document.getElementById('outputSection').classList.remove('hidden');
+
+      // Zxcvbn Crack Time
+      const strength=zxcvbn(input);
+      document.getElementById('crackTime').textContent=`Estimated Crack Time: ${strength.crack_times_display.offline_slow_hashing_1e4_per_second}`;
+    });
+
+    // Copy password
+    document.getElementById('copyBtn').addEventListener('click',()=>{
+      navigator.clipboard.writeText(document.getElementById('outputText').textContent).then(()=>alert('Copied!'));
+    });
+
+    // Email breach check (HaveIBeenPwned API)
+    document.getElementById('checkEmailBtn').addEventListener('click',async()=>{
+      const email=document.getElementById('emailCheckInput').value.trim();
+      const resultEl=document.getElementById('breachResult');
+      if(!email){resultEl.textContent='Enter a valid email'; return;}
+      try{
+        const res=await fetch(`https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent(email)}`,{
+          method:'GET',headers:{'hibp-api-key':'YOUR_API_KEY','Accept':'application/json'}});
+        if(res.status===404){resultEl.textContent=`Good news! No breaches found for ${email}.`}
+        else if(res.ok){const data=await res.json();resultEl.textContent=`${email} found in ${data.length} breaches: ${data.map(d=>d.Name).join(', ')}`;}
+        else{resultEl.textContent='Error checking email';}
+      }catch(e){console.error(e);resultEl.textContent='Something went wrong';}
+    });
+  </script>
+</body>
+</html>
