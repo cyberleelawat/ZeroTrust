@@ -18,6 +18,19 @@ ZeroTrace is a **lightweight, offline-first, privacy-respecting password obfusca
 
 ---
 
+## New Features (Added)
+
+### 1. Password Strength & Crack Time Estimator
+- Uses **zxcvbn** (client-side) to estimate password strength and present human-readable crack-time estimates (e.g., "centuries", "hours", "instant").  
+- Shows the estimated crack time next to the generated/entered password so you can judge how strong the original phrase is before obfuscation.
+
+### 2. Email / Phone Breach Checker
+- Integrates with **Have I Been Pwned (HIBP)** to check if an **email address** appears in known public breaches.  
+- Phone-number breach checks are more limited (HIBP phone checks require different endpoints / paid access) — current implementation focuses on **email** checks and explains how to add phone checks if you have an appropriate API/service.
+- **Important:** HIBP requires an **API key** for requests. The tool provides an input field that calls HIBP only from the client if an API key/configuration is supplied (no email data is sent anywhere else by default).
+
+---
+
 ## How it works (high level)
 
 The generator applies a series of **deterministic transformations** to the input (seeded by a simple hash). In short:
@@ -64,6 +77,18 @@ Certain characters (space, quotes, `%`, `&`, `?`, `#`, etc.) can break or get au
 ---
 
 ## Examples / Demo
+
+
+**Password strength / crack-time example (using zxcvbn)**  
+- `password` → Score 0 → `Estimated crack time: instantly`  
+- `Leelawat@2025` → Score 3 → `Estimated crack time: years`  
+- `My$Tr0ngPhr@se2025` → Score 4 → `Estimated crack time: centuries`
+
+**Email breach example (HIBP)**  
+- `user@example.com` → `Found in 3 breaches: Adobe, LinkedIn, MySpace`  
+- `someone@freshdomain.xyz` → `No breaches found`
+
+---
 
 | Input                  | Output (obfuscated)                 | URL-safe variant                  |
 |------------------------|-----------------------------------|----------------------------------|
